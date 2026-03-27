@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rangasopana — Theatre Arts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --crimson:    #8B1A1A;
+      --gold:       #C9933A;
+      --gold-light: #E8C57A;
+      --ivory:      #F5EDD8;
+      --ink:        #1A1209;
+      --warm-dark:  #2C1A0E;
+      --shadow:     rgba(10, 5, 0, 0.7);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--ivory);
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ── CURTAIN OVERLAY ── */
+    #curtain {
+      position: fixed; inset: 0; z-index: 999;
+      display: flex;
+      pointer-events: none;
+    }
+    #curtain .half {
+      flex: 1;
+      background: var(--crimson);
+      transition: transform 1.6s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+    #curtain .half:first-child { transform-origin: left; }
+    #curtain .half:last-child  { transform-origin: right; }
+    body.open #curtain .half:first-child { transform: scaleX(0); }
+    body.open #curtain .half:last-child  { transform: scaleX(0); }
+
+    /* ── NOISE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    /* ── SPOTLIGHT BACKGROUND ── */
+    .stage-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 70% at 50% 20%, rgba(201,147,58,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 100% 60% at 50% 100%, rgba(139,26,26,0.2) 0%, transparent 60%),
+        var(--ink);
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.4rem 3.5rem;
+      background: linear-gradient(to bottom, rgba(10,5,0,0.85), transparent);
+      backdrop-filter: blur(4px);
+      opacity: 0; transform: translateY(-20px);
+      animation: fadeDown 0.8s 1.8s ease forwards;
+    }
+    .nav-logo {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.3s, color 0.3s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold-light); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 6rem 2rem 4rem;
+    }
+
+    .hero-ornament {
+      width: 260px; margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 1s 2s ease forwards;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0; animation: fadeUp 1s 2.15s ease forwards;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.8rem, 9vw, 8rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--ivory);
+      opacity: 0; animation: fadeUp 1s 2.0s ease forwards;
+      position: relative;
+    }
+    .hero-title span {
+      display: block;
+      color: var(--gold);
+      font-style: italic;
+      font-size: 1.08em;
+    }
+
+    /* Dramatic underline */
+    .hero-title::after {
+      content: '';
+      display: block;
+      width: 160px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 1.6rem auto 0;
+      opacity: 0; animation: fadeIn 1s 2.8s ease forwards;
+    }
+
+    .hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      color: rgba(245,237,216,0.65);
+      max-width: 540px;
+      line-height: 1.7;
+      opacity: 0; animation: fadeUp 1s 2.6s ease forwards;
+      margin-top: 2rem;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      margin-top: 3rem;
+      padding: 0.85rem 2.8rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.45s;
+      opacity: 0; animation: fadeUp 1s 2.8s ease forwards;
+    }
+    .hero-cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.45s cubic-bezier(0.76,0,0.24,1);
+      z-index: -1;
+    }
+    .hero-cta:hover { color: var(--ink); }
+    .hero-cta:hover::before { transform: scaleX(1); }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      opacity: 0; animation: fadeIn 1s 3.5s ease forwards;
+      color: rgba(245,237,216,0.4);
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, transparent, var(--gold));
+      animation: scrollPulse 2s 3.5s ease infinite;
+    }
+
+    /* ── DIVIDER ── */
+    .ornamental-divider {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 0 2rem;
+      margin: 2rem 0;
+    }
+    .ornamental-divider svg { width: 480px; max-width: 90vw; }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+    }
+    .feature {
+      padding: 3rem 2.5rem;
+      border: 1px solid rgba(201,147,58,0.15);
+      border-collapse: collapse;
+      text-align: center;
+      transition: background 0.4s;
+    }
+    .feature:hover { background: rgba(201,147,58,0.05); }
+    .feature-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+    .feature h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      margin-bottom: 0.8rem;
+    }
+    .feature p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: rgba(245,237,216,0.6);
+      font-style: italic;
+    }
+
+    /* ── QUOTE ── */
+    .quote-section {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 5rem 2rem;
+      background: rgba(139,26,26,0.08);
+      border-top: 1px solid rgba(201,147,58,0.15);
+      border-bottom: 1px solid rgba(201,147,58,0.15);
+      margin-bottom: 5rem;
+    }
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 7rem;
+      line-height: 0.5;
+      color: var(--crimson);
+      opacity: 0.4;
+    }
+    blockquote {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+      line-height: 1.6;
+      color: var(--ivory);
+      max-width: 720px;
+      margin: 1rem auto 0;
+    }
+    blockquote cite {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 1.5rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 3rem 2rem 4rem;
+      border-top: 1px solid rgba(201,147,58,0.1);
+    }
+    .footer-logo {
+      font-family: 'IM Fell English', serif;
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    footer p {
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: rgba(245,237,216,0.3);
+      text-transform: uppercase;
+    }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.15); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      .hero-cta { padding: 0.75rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Curtain reveal -->
+  <div id="curtain">
+    <div class="half"></div>
+    <div class="half"></div>
+  </div>
+
+  <!-- Atmospheric bg -->
+  <div class="stage-bg"></div>
+
+  <!-- Navigation -->
+  <!-- <nav>
+    <a class="nav-logo" href="#">Rangasopana</a>
+    <!-- <ul class="nav-links">
+      <li><a href="#">Productions</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Artists</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul> -->
+  </nav> -->
+
+  <!-- Hero -->
+  <section class="hero">
+
+    <!-- SVG ornament -->
+    <svg class="hero-ornament" viewBox="0 0 260 40" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="20" x2="90" y2="20" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <circle cx="130" cy="20" r="6" fill="none" stroke="#C9933A" stroke-width="0.8"/>
+      <circle cx="130" cy="20" r="2" fill="#C9933A" opacity="0.6"/>
+      <circle cx="110" cy="20" r="3" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <circle cx="150" cy="20" r="3" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <line x1="170" y1="20" x2="260" y2="20" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <path d="M95 12 L105 20 L95 28" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.4"/>
+      <path d="M165 12 L155 20 L165 28" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.4"/>
+    </svg>
+
+    <h1 class="hero-title">
+      Welcome to
+      <span>Rangasopana</span>
+    </h1>
+
+    
+  </section>
+
+  <!-- Ornamental divider -->
+  <div class="ornamental-divider">
+    <svg viewBox="0 0 480 24" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="12" x2="180" y2="12" stroke="#C9933A" stroke-width="0.5" opacity="0.4"/>
+      <path d="M190 12 L200 4 L210 12 L200 20 Z" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <rect x="226" y="8" width="8" height="8" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5" transform="rotate(45 230 12)"/>
+      <circle cx="240" cy="12" r="3" fill="#C9933A" opacity="0.3"/>
+      <rect x="246" y="8" width="8" height="8" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5" transform="rotate(45 250 12)"/>
+      <path d="M270 12 L280 4 L290 12 L280 20 Z" fill="none" stroke="#C9933A" stroke-width="0.6" opacity="0.5"/>
+      <line x1="300" y1="12" x2="480" y2="12" stroke="#C9933A" stroke-width="0.5" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <!-- Features -->
+  <!-- <section class="features">
+    <div class="feature">
+      <span class="feature-icon">🎭</span>
+      <h3>Classical Productions</h3>
+      <p>Rooted in centuries-old tradition, our productions breathe new life into timeless narratives from Indian and world theatre.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🪔</span>
+      <h3>Cultural Heritage</h3>
+      <p>We honour the craft of Ranga — the stage — as a living, sacred space where culture is preserved and reborn every night.</p>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">✦</span>
+      <h3>Emerging Voices</h3>
+      <p>A nurturing ground for new playwrights, directors, and performers who carry the torch of theatrical art into tomorrow.</p>
+    </div>
+  </section> -->
+
+  <!-- Quote -->
+  <!-- <div class="quote-section">
+    <div class="quote-mark">"</div>
+    <blockquote>
+      The stage is a magic circle where only the most real things happen,
+      a neutral territory outside the jurisdiction of Fate,
+      where stars may be crossed with impunity.
+      <cite>— The Spirit of Theatre</cite>
+    </blockquote>
+  </div> -->
+
+  <!-- Footer -->
+  <!-- <footer>
+    <p class="footer-logo">Rangasopana</p>
+    <p>Theatre Arts</p>
+  </footer> -->
+
+  <script>
+    // Open curtain on load
+    window.addEventListener('load', () => {
+      setTimeout(() => document.body.classList.add('open'), 100);
+    });
+  </script>
+</body>
+</html>
