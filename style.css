@@ -1,0 +1,566 @@
+/* ════════════════════════════════════════════
+   Rangasopana — Theatre Company
+   ════════════════════════════════════════════ */
+
+:root {
+  --velvet: #7a0e1c;
+  --velvet-dark: #4a0610;
+  --velvet-deep: #2e040a;
+  --gold: #d9a441;
+  --gold-bright: #f3cf7a;
+  --ink: #14080b;
+  --stage: #1c0d12;
+  --cream: #f5e8d0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: "Cormorant Garamond", Georgia, serif;
+  overflow-x: hidden;
+}
+
+body.curtains-closed { overflow: hidden; }
+
+/* ════════ Curtains ════════ */
+
+.curtain-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.curtain {
+  position: absolute;
+  top: 0;
+  width: 52%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--velvet-dark) 0px,
+      var(--velvet) 30px,
+      #9c1526 55px,
+      var(--velvet) 80px,
+      var(--velvet-dark) 110px
+    );
+  box-shadow: inset 0 -120px 90px rgba(0, 0, 0, 0.65),
+              0 0 60px rgba(0, 0, 0, 0.8);
+  transition: transform 2.4s cubic-bezier(0.65, 0, 0.25, 1);
+}
+
+.curtain-left  { left: 0;  border-right: 6px solid var(--velvet-deep); }
+.curtain-right { right: 0; border-left: 6px solid var(--velvet-deep); }
+
+.curtain-stage.open .curtain-left  { transform: translateX(-105%); }
+.curtain-stage.open .curtain-right { transform: translateX(105%); }
+
+/* Valance — the frill across the top */
+
+.valance {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 110px;
+  transition: transform 1.6s cubic-bezier(0.65, 0, 0.25, 1) 1.6s;
+}
+
+.curtain-stage.open .valance { transform: translateY(-115%); }
+
+.valance-scallops {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 0%, transparent 58px, var(--velvet) 59px, var(--velvet-dark) 100%);
+  background-size: 124px 110px;
+  background-repeat: repeat-x;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.7));
+  border-top: 10px solid var(--velvet-deep);
+}
+
+.tassel-row {
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+}
+
+.tassel-row span {
+  width: 8px;
+  height: 26px;
+  background: linear-gradient(var(--gold), #8a6420);
+  border-radius: 0 0 5px 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* ════════ Top nav ════════ */
+
+.topnav {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border: 1px solid rgba(217, 164, 65, 0.4);
+  border-radius: 50px;
+  background: rgba(20, 8, 11, 0.7);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  animation: fadeIn 0.8s ease 3s forwards;
+}
+
+.nav-link {
+  padding: 10px 22px;
+  border: 1px solid transparent;
+  border-radius: 40px;
+  font-family: "Cinzel", serif;
+  font-size: 0.82rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-decoration: none;
+  transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-color: var(--gold);
+  box-shadow: 0 4px 18px rgba(217, 164, 65, 0.4);
+}
+
+@media (max-width: 640px) {
+  .topnav {
+    left: 12px;
+    right: 12px;
+    transform: none;
+    border-radius: 24px;
+    gap: 4px;
+    padding: 8px 10px;
+  }
+  .nav-link {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+  }
+}
+
+/* ════════ Hero ════════ */
+
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 110%, #3a1420 0%, var(--ink) 62%);
+  overflow: hidden;
+}
+
+.spotlight {
+  position: absolute;
+  top: -12%;
+  width: 46vw;
+  height: 125vh;
+  background: linear-gradient(rgba(243, 207, 122, 0.16), transparent 72%);
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0% 100%);
+  filter: blur(8px);
+  animation: sway 7s ease-in-out infinite alternate;
+}
+
+.spotlight-left  { left: -4%;  transform-origin: top center; }
+.spotlight-right { right: -4%; animation-delay: -3.5s; }
+
+@keyframes sway {
+  from { transform: rotate(-6deg); }
+  to   { transform: rotate(6deg); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+  opacity: 0;
+  transform: translateY(26px) scale(0.97);
+  animation: riseIn 1.6s ease 2.2s forwards;
+}
+
+@keyframes riseIn {
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+.hero-logo {
+  width: clamp(180px, 24vw, 260px);
+  margin-bottom: 24px;
+  filter: drop-shadow(0 0 30px rgba(222, 140, 60, 0.45))
+          drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
+}
+
+.hero-title {
+  font-family: "Cinzel", serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 6.5vw, 4.6rem);
+  line-height: 1.15;
+  letter-spacing: 2px;
+}
+
+.hero-title span {
+  display: block;
+  background: linear-gradient(180deg, #f5c178, #de8c3c 50%, #a85a22 85%, #7c3f16);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 38px rgba(222, 140, 60, 0.4);
+}
+
+.hero-rule, .section-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--gold);
+  margin: 22px auto;
+}
+
+.hero-rule i, .section-rule i {
+  display: block;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.hero-tag {
+  font-style: italic;
+  font-size: 1.35rem;
+  color: rgba(245, 232, 208, 0.85);
+}
+
+.stage-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background:
+    linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.7)),
+    repeating-linear-gradient(90deg, #3a2417 0 90px, #2c1a10 90px 180px);
+  box-shadow: 0 -18px 50px rgba(243, 207, 122, 0.12);
+}
+
+/* ════════ Sections ════════ */
+
+.section {
+  padding: 110px 8vw;
+  text-align: center;
+  position: relative;
+}
+
+.section:nth-of-type(even) {
+  background: radial-gradient(ellipse at 50% 0%, #241018 0%, var(--ink) 70%);
+}
+
+.section-title {
+  font-family: "Cinzel", serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+
+/* About */
+
+.about-cards {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+.about-card {
+  width: 200px;
+  padding: 36px 20px;
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(122, 14, 28, 0.25), rgba(20, 8, 11, 0.6));
+  transition: transform 0.35s, box-shadow 0.35s;
+}
+
+.about-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(217, 164, 65, 0.18);
+}
+
+.about-icon { font-size: 2.4rem; margin-bottom: 14px; }
+
+.about-card h3 {
+  font-family: "Cinzel", serif;
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+  color: var(--cream);
+}
+
+.about-line {
+  margin-top: 44px;
+  font-style: italic;
+  font-size: 1.3rem;
+  color: rgba(245, 232, 208, 0.8);
+}
+
+/* Gallery — horizontal scroller */
+
+.gallery-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 46px;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.gallery-scroller {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 12px 6px 22px;
+  flex: 1;
+  /* fade the strip out at both edges */
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) rgba(217, 164, 65, 0.12);
+}
+
+.gallery-scroller::-webkit-scrollbar { height: 6px; }
+.gallery-scroller::-webkit-scrollbar-track {
+  background: rgba(217, 164, 65, 0.12);
+  border-radius: 6px;
+}
+.gallery-scroller::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 6px;
+}
+
+.g-item {
+  flex: 0 0 auto;
+  width: min(420px, 76vw);
+  height: 300px;
+  scroll-snap-align: center;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+
+.g-item:hover {
+  transform: scale(1.03);
+  box-shadow: 0 14px 40px rgba(217, 164, 65, 0.18);
+}
+
+.g-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s;
+}
+
+.g-item:hover img { transform: scale(1.07); }
+
+.g-placeholder {
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 40%, #3a1420, var(--ink));
+}
+
+.g-placeholder span {
+  font-size: 2rem;
+  color: rgba(217, 164, 65, 0.5);
+}
+
+.g-arrow {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(217, 164, 65, 0.5);
+  background: rgba(20, 8, 11, 0.7);
+  color: var(--gold);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+.g-arrow:hover {
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: var(--ink);
+  box-shadow: 0 4px 18px rgba(217, 164, 65, 0.4);
+}
+
+@media (max-width: 640px) {
+  .g-arrow { display: none; }
+  .g-item { height: 240px; }
+}
+
+/* Plays — tickets */
+.tickets {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 46px;
+}
+
+.ticket {
+  /* Changed to block to let the body take up 100% width and center perfectly */
+  display: block; 
+  width: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #221016, #160a0e);
+  border: 1px solid rgba(217, 164, 65, 0.4);
+  transition: transform 0.35s, box-shadow 0.35s;
+}
+
+.ticket:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: 0 18px 44px rgba(217, 164, 65, 0.2);
+}
+
+/* Completely removed .ticket-stub rules since it's no longer needed */
+
+.ticket-body {
+  padding: 28px 24px;
+  text-align: center; /* This ensures all text inside is centered */
+}
+
+.ticket-body h3 {
+  font-family: "Cinzel", serif;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  color: var(--gold-bright);
+  margin-bottom: 8px;
+}
+
+.ticket-body p {
+  font-style: italic;
+  color: rgba(245, 232, 208, 0.7);
+}
+
+/* Contact */
+
+.contact-row {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  margin-top: 44px;
+}
+
+.contact-chip {
+  padding: 14px 30px;
+  border: 1px solid rgba(217, 164, 65, 0.45);
+  border-radius: 40px;
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 1.1rem;
+  background: rgba(122, 14, 28, 0.18);
+  transition: background 0.3s, transform 0.3s;
+}
+
+a.contact-chip:hover {
+  background: rgba(217, 164, 65, 0.2);
+  transform: translateY(-3px);
+}
+
+/* Footer */
+
+.footer {
+  padding: 36px;
+  text-align: center;
+  font-family: "Cinzel", serif;
+  letter-spacing: 5px;
+  color: var(--gold);
+  border-top: 1px solid rgba(217, 164, 65, 0.25);
+}
+
+.footer-socials {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.footer-socials a {
+  color: var(--gold) !important; /* Forces your gold color */
+  text-decoration: none;
+  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Fixes SVG visibility */
+.footer-socials svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor; 
+}
+
+/* Specific fix for Instagram's line-drawing style */
+.footer-socials a[aria-label="Instagram"] svg {
+  fill: none !important;
+  stroke: currentColor;
+}
+
+.footer-socials a:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Scroll reveal */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01s !important;
+    transition-duration: 0.01s !important;
+  }
+  .hero-content, .topnav { opacity: 1; }
+}
